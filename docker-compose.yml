@@ -1,0 +1,51 @@
+version: '3.3'
+services:
+  traefik:
+    image: traefik:v2.6
+    container_name: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.swarmmode=false"
+      - "traefik.docker.network=traefik-public"
+      # - "traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$ACfXEFDz$$xDq7SS1YYYvjFVYX8wPOd1"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.traefik-public-http.rule=Host(`traefik.example.com`)"
+      - "traefik.http.routers.traefik-public-http.entrypoints=http"
+      - "traefik.http.routers.traefik-public-http.middlewares=https-redirect"
+      - "traefik.http.routers.traefik-public-https.rule=Host(`traefik.example.com`)"
+      - "traefik.http.routers.traefik-public-https.entrypoints=https"
+      - "traefik.http.routers.traefik-public-https.tls=true"
+      - "traefik.http.routers.traefik-public-https.service=api@internal"
+      - "traefik.http.routers.traefik-public-https.tls.certresolver=le"
+      # - "traefik.http.routers.traefik-public-https.middlewares=admin-auth"
+      - "traefik.http.services.traefik-public.loadbalancer.server.port=8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-public-certificates:/certificates
+      - /var/log/traefik:/var/log/traefik
+    command:
+      - --providers.docker
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --certificatesresolvers.le.acme.email=email@example.com
+      - --certificatesresolvers.le.acme.storage=/certificates/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - --log
+      - --api
+    networks:
+      - traefik-public
+
+volumes:
+  traefik-public-certificates:
+
+networks:
+  traefik-public:
+    external: true
