@@ -4,12 +4,12 @@ Docker Compose for Traefik on Docker
 --- 
 # Setup Static And Dynamic Configuration With Traefik On Docker
 
-Lets rewrite our docker-compose.yml script for Traefik. If you already have the service up and running you will need to unload it with docker-compose down
-
 Prerequisites
 - Ubuntu 20.04 (Recommended)
 - Docker
 - Docker Compose
+
+Lets rewrite our docker-compose.yml script for Traefik. If you already have the service up and running you will need to unload it with docker-compose down
 
 ```
 vi docker-compose.yml
