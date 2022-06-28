@@ -100,16 +100,32 @@ vi /etc/traefik/routes.yml
 ```
 http:
   routers:
+
+    dashboard-http:
+      entryPoints:
+      - web
+      middlewares:
+      - https-redirect
+      rule: "Host(`traefik.example.com`)"
+      service: api@internal
+    dashboard-https:
+      entryPoints:
+      - websecure
+      rule: "Host(`traefik.example.com`)"
+      service: api@internal
+      tls:
+        certResolver: le
+
     app-http:
       entryPoints:
-      - http
+      - web
       middlewares:
       - https-redirect
       rule: "Host(`example.com`)"
       service: app
     app-https:
       entryPoints:
-      - https
+      - websecure
       rule: "Host(`example.com`)"
       service: app
       tls:
